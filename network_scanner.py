@@ -30,8 +30,9 @@ def parse_interface():
     return l
 
 def get_signal_strength(address):
-    return parse_interface()[address]
+    return int(parse_interface()[address]['Signal level'].split(' ')[0])
 
 if __name__ == '__main__':
     #interface = 'wlp1s0' # 'wlan0' for rpi
-    print(parse_interface())
+    address = next(iter(parse_interface()))
+    print(address, get_signal_strength(address))
