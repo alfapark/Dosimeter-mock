@@ -32,7 +32,7 @@ circle_holes, // array of [x,y, diameter] - x,y is the offset from center
         }
         // other holes
         for(object = rectangle_holes){
-            translate([object[0]+offset_x, object[1]+offset_y,0])
+            translate([object[0]+offset_x, object[1]+offset_y,-object[4]])
                 cube([object[2], object[3], thickness]);
         }
         for(object = circle_holes){
@@ -82,17 +82,18 @@ thickness=2.5,
 screw_offset=5,
 screw_hole_size=5,
 rectangle_holes=[
-    [80, 120, 30, 14], // display
-    [90, 40, 12, 12] //button 
+    [80, 120, 30, 14,0], // display
+    [90, 40, 12, 12,0], // button 
+    [10, 10, 43, 61, 1.5] // NFC 
 ], 
 circle_holes=[
-    [20,80,4.5], // status
-    [50,80,4.5], // HP
-    [60,80,4.5],
-    [70,80,4.5],
-    [80,80,4.5],
-    [90,80,4.5],
-    [100,80,4.5]
+    [50,90,4.5], // HP
+    [60,90,4.5],
+    [70,90,4.5],
+    [80,90,4.5],
+    [90,90,4.5],
+    [100,90,4.5],
+    [100,105,4.5],//status
 ]
 );
 
@@ -105,6 +106,6 @@ screw_offset=5,
 screw_hole_size=5,
 walls=[
     [125-91-2.5, 0, 2.5, 20, 22], // powerbank short
-    [125-90,43,91,2.5,22]
+    [125-90,43,91,2.5,22] // powerbonk long
 ]
 );
