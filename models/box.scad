@@ -49,7 +49,8 @@ module box_lower(
     thickness, // thickness of the lid
     screw_offset, // both x and y offset for screw hole from the corner to the center of the hole
     screw_hole_size,
-    walls, // array of [x,y, size_x, size_y, size_z] - x,y is the offset to the left upper corner
+    walls, // array of [x,y, size_x, size_y, size_z] - x,y is the offset to the left upper corner,
+    columns, // array of [x,y, diameter, height]
 ){
     offset_x = thickness;
     offset_y = 2*screw_offset;
@@ -73,6 +74,11 @@ module box_lower(
         translate([object[0]+offset_x, object[1]+offset_y, offset_z])
             cube([object[2], object[3], object[4]]);
     }
+    
+    for(object = columns){
+        translate([object[0]+offset_x, object[1]+offset_y, offset_z])
+            cylinder(d = object[2], h = object[3]);
+    }
 }
 translate([0,0, 200])
 box_upper(
@@ -82,30 +88,37 @@ thickness=2.5,
 screw_offset=5,
 screw_hole_size=5,
 rectangle_holes=[
-    [80, 120, 30, 14,0], // display
+    [80, 120, 31, 14.5,0], // display
     [90, 40, 12, 12,0], // button 
     [10, 10, 43, 61, 1.5] // NFC 
 ], 
 circle_holes=[
-    [50,90,4.5], // HP
-    [60,90,4.5],
-    [70,90,4.5],
-    [80,90,4.5],
-    [90,90,4.5],
-    [100,90,4.5],
-    [100,105,4.5],//status
+    [60,90,6], // HP
+    [70,90,6],
+    [80,90,6],
+    [90,90,6],
+    [100,90,6],
+    [110,90,6],
+    [110,105,6],//status
 ]
 );
-
+rpi_screw1_x = 10;
+rpi_screw1_y = 145;
 box_lower(
 size_x=125,
 size_y=150,
 size_z =40,
 thickness=2.5,
 screw_offset=5,
-screw_hole_size=5,
+screw_hole_size=3,
 walls=[
     [125-91-2.5, 0, 2.5, 20, 22], // powerbank short
-    [125-90,43,91,2.5,22] // powerbonk long
+    [125-90,44,91,2.5,22] // powerbonk long
+],
+columns=[
+    [rpi_screw1_x,rpi_screw1_y,2.5,5], // RPI screw columns
+    [rpi_screw1_x+58,rpi_screw1_y,2.5,5],
+    [rpi_screw1_x,rpi_screw1_y-49,2.5,5],
+    [rpi_screw1_x+58,rpi_screw1_y-49,2.5,5]
 ]
 );
