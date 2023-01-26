@@ -5,6 +5,7 @@ import sys
 from threading import Thread
 from enum import Enum
 import traceback
+import json
 
 from healthbar import HealthBar
 from read import Reader
@@ -12,6 +13,15 @@ from display import Display
 from button import Button
 
 # address = sys.argv[1]
+
+def load_json_file(file_location):
+    data = dict()
+    try:
+        with open(file_location) as json_file:
+            data = json.load(json_file)
+    except FileNotFoundError:
+        pass
+    return data
 
 NFC_MSG = None        
 
@@ -22,6 +32,14 @@ def NFC_reading():
         id,text = reader.read()
         print(id, text)
         NFC_MSG = text
+        time.sleep(1)
+
+WIFI_signals = dict()
+
+def WIFI_reading():
+    global WIFI_signals
+    while True:
+        WIFI_signals = network_scanner.parse_signal_strengths()
         time.sleep(1)
 
 class State(Enum):
@@ -58,6 +76,13 @@ class DosimeterMock:
 
         self.button = Button(4)
         self.button_hold_last_time = False
+
+        self.parse_config()
+
+    def parse_config(self):
+        config_dict = load_json_file("config.json")
+        self.goal_address = config_dict["goal_adr"]
+        self.radiation_addresses = config_dict["radiation_adrs"]
 
 
     def set_initial_state(self):
@@ -113,25 +138,38 @@ class DosimeterMock:
     def game_ended(self):
         return self.state in [State.DEAD, State.FINISHED]
 
+    def handle_network(self):
+        global WIFI_signals
+        signals = WIFI_signals
+        self.goal_distance = 999
+        if self.goal_address in signals:
+            self.goal_distance = -signals[self.goal_address]
+        self.radiation_strength = 0
+        for address in self.radiation_addresses:
+            if address in signals:
+                self.radiation_strength += signals[self.goal_address] + 100
+
+    def update_HP(self):
+        self.HP -= self.radiation_strength/100
+
     def loop(self):
         NFC_thread = Thread(target=NFC_reading, args=[])
         NFC_thread.start()
         while True:
             while not self.game_ended():
                 try:
-                    # strength = -network_scanner.get_signal_strength(address)
                     print("cycle")
+                    self.handle_network()
                     self.HPBar.display(self.HP)
                     self.check_NFC()
                     self.handle_state()
                     self.check_game()
-                    self.HP -= 1
+                    self.update_HP()
                 except Exception as e:
                     traceback.print_exc()
                     print('Exception', str(e))
                 time.sleep(0.1)
             self.check_NFC()
-            time.sleep(0.1)
 
 
 if __name__ == "__main__":
