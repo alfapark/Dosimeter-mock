@@ -23,25 +23,6 @@ def load_json_file(file_location):
         pass
     return data
 
-NFC_MSG = None        
-
-def NFC_reading():
-    global NFC_MSG
-    reader = Reader()
-    while True:
-        id,text = reader.read()
-        print(id, text)
-        NFC_MSG = text
-        time.sleep(1)
-
-WIFI_signals = dict()
-
-def WIFI_reading():
-    global WIFI_signals
-    while True:
-        WIFI_signals = network_scanner.parse_interface()
-        time.sleep(1)
-
 class State(Enum):
     RADIATION = 1
     TIME = 2
@@ -79,6 +60,9 @@ class DosimeterMock:
 
         self.parse_config()
 
+        self.NFC_MSG = None        
+        self.WIFI_signals = dict()
+
     def parse_config(self):
         try:
             config_dict = load_json_file("config.json")
@@ -100,9 +84,8 @@ class DosimeterMock:
         return int(elapsed)
 
     def check_NFC(self):
-        global NFC_MSG
-        msg = NFC_MSG
-        NFC_MSG = None
+        msg = self.NFC_MSG
+        self.NFC_MSG = None
         if msg is None:
             return
         msg = msg.strip()
@@ -142,23 +125,22 @@ class DosimeterMock:
         return self.state in [State.DEAD, State.FINISHED]
 
     def handle_network(self):
-        global WIFI_signals
-        signals = WIFI_signals
+        signals = self.WIFI_signals
         self.goal_distance = 999
         self.radiation_strength = 0
-        for address in WIFI_signals:
-            if address in self.radiation_addresses or WIFI_signals[address]['ESSID'] == '"DM-radiation"':
-                self.radiation_strength += network_scanner.parse_signal_strength(WIFI_signals[address]) + 100
-            if self.goal_address in signals or WIFI_signals[address]['ESSID'] == '"DM-goal"':
-                self.goal_distance = -network_scanner.parse_signal_strength(WIFI_signals[address])
+        for address in signals:
+            if address in self.radiation_addresses or signals[address]['ESSID'] == '"DM-radiation"':
+                self.radiation_strength += network_scanner.parse_signal_strength(signals[address]) + 100
+            if self.goal_address == address or signals[address]['ESSID'] == '"DM-goal"':
+                self.goal_distance = -network_scanner.parse_signal_strength(signals[address])
 
     def update_HP(self):
         self.HP -= self.radiation_strength/1000
 
     def loop(self):
-        NFC_thread = Thread(target=NFC_reading, args=[])
+        NFC_thread = Thread(target=self.NFC_reading, args=[])
         NFC_thread.start()
-        WIFI_thread = Thread(target=WIFI_reading, args=[])
+        WIFI_thread = Thread(target=self.WIFI_reading, args=[])
         WIFI_thread.start()
         while True:
             while not self.game_ended():
@@ -176,6 +158,21 @@ class DosimeterMock:
                 time.sleep(0.1)
             self.check_NFC()
             time.sleep(0.1)
+
+
+    def NFC_reading(self):
+        reader = Reader()
+        while True:
+            id,text = reader.read()
+            print(id, text)
+            self.NFC_MSG = text
+            time.sleep(1)
+
+
+    def WIFI_reading(self):
+        while True:
+            self.WIFI_signals = network_scanner.parse_interface()
+            time.sleep(1)
 
 
 if __name__ == "__main__":
