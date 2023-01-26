@@ -16,11 +16,13 @@ from button import Button
 NFC_MSG = None        
 
 def NFC_reading():
+    global NFC_MSG
     reader = Reader()
     while True:
         id,text = reader.read()
         print(id, text)
         NFC_MSG = text
+        time.sleep(1)
 
 class State(Enum):
     RADIATION = 1

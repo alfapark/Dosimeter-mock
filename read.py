@@ -7,10 +7,7 @@ class Reader:
         self.reader = SimpleMFRC522()
 
     def read(self):
-        try:
-            id, text =self.reader.read()
-        finally:
-            GPIO.cleanup()
+        id, text =self.reader.read()
         return id,text
 
 if __name__ == "__main__":
