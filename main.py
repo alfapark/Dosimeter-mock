@@ -48,7 +48,7 @@ class DosimeterMock:
         GPIO.setwarnings(True)
 
         self.status_led_pin = 21
-        GPIO.setup(status_led_pin,GPIO.OUT)
+        GPIO.setup(self.status_led_pin,GPIO.OUT)
 
         leds = [20,26,19,13,6,5]
         self.HPBar = HealthBar(leds, maxval=self.HP)
