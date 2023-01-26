@@ -29,10 +29,13 @@ def parse_interface():
     l = {c['Address']:c for c in l} # to dict
     return l
 
+def parse_signal_strengths():
+    l = parse_interface()
+    return { c:int(l[c]['Signal level'].split(' ')[0]) for c in l}
+
 def get_signal_strength(address):
     return int(parse_interface()[address]['Signal level'].split(' ')[0])
 
 if __name__ == '__main__':
     #interface = 'wlp1s0' # 'wlan0' for rpi
-    address = next(iter(parse_interface()))
-    print(address, get_signal_strength(address))
+    print(parse_signal_strengths())
