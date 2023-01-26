@@ -100,7 +100,7 @@ class DosimeterMock:
             self.display.display_number('R', self.radiation_strength)
         elif self.state == State.GOAL_DISTANCE:
             self.display.display_number('G', self.goal_distance)
-        else:
+        elif self.State not in [State.FINISHED, State.DEAD]:
             raise Exception("Wrong state: " + str(self.state))
 
     def game_ended(self):
