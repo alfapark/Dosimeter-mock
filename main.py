@@ -89,12 +89,12 @@ class DosimeterMock:
             try:
                 # strength = -network_scanner.get_signal_strength(address)
                 print("cycle")
-                self.HPBar.display(HP)
+                self.HPBar.display(self.HP)
                 self.check_NFC()
                 self.display.display_time()
-                HP -= 1
+                self.HP -= 1
             except Exception as e:
-                print('Excetion', str(e))
+                print('Exception', str(e))
             time.sleep(0.1)
 
 
