@@ -47,7 +47,7 @@ class DosimeterMock:
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(True)
 
-        status_led_pin = 21
+        self.status_led_pin = 21
         GPIO.setup(status_led_pin,GPIO.OUT)
 
         leds = [20,26,19,13,6,5]
@@ -62,6 +62,8 @@ class DosimeterMock:
 
         self.NFC_MSG = None        
         self.WIFI_signals = dict()
+
+        self.status_time = time.time()
 
     def parse_config(self):
         try:
@@ -78,6 +80,14 @@ class DosimeterMock:
         self.goal_distance = 100
         self.HP = 100
         self.start = time.time()
+
+    def status_led_up(self):
+        GPIO.output(self.status_led_pin, True)
+        self.status_time = time.time() + 0.2
+
+    def update_status_led(self):
+        if self.status_time < time.time():
+            GPIO.output(self.status_led_pin, False)
 
     def get_elapsed_seconds(self):
         elapsed = time.time() - self.start
@@ -146,6 +156,7 @@ class DosimeterMock:
             while not self.game_ended():
                 try:
                     print("cycle")
+                    self.update_status_led()
                     self.handle_network()
                     self.HPBar.display(self.HP)
                     self.check_NFC()
@@ -156,6 +167,7 @@ class DosimeterMock:
                     traceback.print_exc()
                     print('Exception', str(e))
                 time.sleep(0.1)
+                self.status_led_up()
             self.check_NFC()
             time.sleep(0.1)
 
@@ -164,6 +176,7 @@ class DosimeterMock:
         reader = Reader()
         while True:
             id,text = reader.read()
+            self.status_led_up()
             print(id, text)
             self.NFC_MSG = text
             time.sleep(1)
@@ -171,7 +184,10 @@ class DosimeterMock:
 
     def WIFI_reading(self):
         while True:
-            self.WIFI_signals = network_scanner.parse_interface()
+            WIFI_signals = network_scanner.parse_interface()
+            if WIFI_signals != self.WIFI_signals:
+                self.status_led_up()
+            self.WIFI_signals = WIFI_signals
             time.sleep(1)
 
 
