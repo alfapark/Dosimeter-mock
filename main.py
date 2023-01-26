@@ -100,15 +100,17 @@ class DosimeterMock:
             self.display.display_number('R', self.radiation_strength)
         elif self.state == State.GOAL_DISTANCE:
             self.display.display_number('G', self.goal_distance)
-        elif self.State not in [State.FINISHED, State.DEAD]:
+        elif self.state not in [State.FINISHED, State.DEAD]:
             raise Exception("Wrong state: " + str(self.state))
 
-    def game_ended(self):
+    def check_game(self):
         if self.HP <= 0:
             self.state = State.DEAD
             self.display.display_text("dead")
         if self.state == State.FINISHED:
             self.display.display_time(self.get_elapsed_seconds())
+
+    def game_ended(self):
         return self.state in [State.DEAD, State.FINISHED]
 
     def loop(self):
@@ -122,6 +124,7 @@ class DosimeterMock:
                     self.HPBar.display(self.HP)
                     self.check_NFC()
                     self.handle_state()
+                    self.check_game()
                     self.HP -= 1
                 except Exception as e:
                     traceback.print_exc()
