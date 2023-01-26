@@ -144,9 +144,9 @@ class DosimeterMock:
         self.goal_distance = 999
         self.radiation_strength = 0
         for address in WIFI_signals:
-            if address in self.radiation_addresses or WIFI_signals[address]['ESSID'] == "DM-radiation":
+            if address in self.radiation_addresses or WIFI_signals[address]['ESSID'] == '"DM-radiation"':
                 self.radiation_strength += network_scanner.parse_signal_strength(WIFI_signals[address]) + 100
-            if self.goal_address in signals or WIFI_signals[address]['ESSID'] == "DM-goal":
+            if self.goal_address in signals or WIFI_signals[address]['ESSID'] == '"DM-goal"':
                 self.goal_distance = -network_scanner.parse_signal_strength(WIFI_signals[address])
 
     def update_HP(self):
