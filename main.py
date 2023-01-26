@@ -109,18 +109,20 @@ class DosimeterMock:
     def loop(self):
         NFC_thread = Thread(target=NFC_reading, args=[])
         NFC_thread.start()
-        while not self.game_ended():
-            try:
-                # strength = -network_scanner.get_signal_strength(address)
-                print("cycle")
-                self.HPBar.display(self.HP)
-                self.check_NFC()
-                self.handle_state()
-                self.HP -= 1 
-            except Exception as e:
-                traceback.print_exc()
-                print('Exception', str(e))
-            time.sleep(0.1)
+        while True:
+            while not self.game_ended():
+                try:
+                    # strength = -network_scanner.get_signal_strength(address)
+                    print("cycle")
+                    self.HPBar.display(self.HP)
+                    self.check_NFC()
+                    self.handle_state()
+                    self.HP -= 1
+                except Exception as e:
+                    traceback.print_exc()
+                    print('Exception', str(e))
+                time.sleep(0.1)
+            self.check_NFC()
 
 
 if __name__ == "__main__":
