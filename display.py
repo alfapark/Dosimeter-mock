@@ -17,6 +17,9 @@ class Display:
         chars = letter + str(number).zfill(3)
         self.tm.show(chars)
 
+    def display_text(self, text):
+        self.tm.show(text)
+
 
 if __name__ == "__main__":
     # all LEDS on "88:88"

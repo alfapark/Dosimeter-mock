@@ -28,9 +28,11 @@ class State(Enum):
     HEALTH = 3
     GOAL_DISTANCE = 4
     FINISHED = 10
+    DEAD = 11
 
 next_state = {
     State.FINISHED: State.FINISHED,
+    State.DEAD: State.DEAD,
     State.RADIATION : State.TIME,
     State.TIME : State.HEALTH,
     State.HEALTH : State.GOAL_DISTANCE,
@@ -47,7 +49,7 @@ class DosimeterMock:
         GPIO.setup(status_led_pin,GPIO.OUT)
         self.HP = 100
 
-        leds = [5,6,13,19,26,20]
+        leds = [20,26,19,13,6,5]
         self.HPBar = HealthBar(leds, maxval=self.HP)
 
         self.display = Display(clk_pin=3, dio_pin=2)
@@ -55,6 +57,9 @@ class DosimeterMock:
         self.button = Button(4)
         self.button_hold_last_time = False
 
+        self.set_initial_state()
+
+    def set_initial_state(self):
         self.state = State.GOAL_DISTANCE
         self.radiation_strength = 0
         self.goal_distance = 100
@@ -67,6 +72,10 @@ class DosimeterMock:
             return
         if msg == "HP":
             self.HP = 100
+        elif msg == "GOAL":
+            self.state = State.FINISHED
+        elif msg == "RESET":
+            self.set_initial_state()
 
     def handle_state(self):
         button_hold = self.button.is_hold()
@@ -84,10 +93,18 @@ class DosimeterMock:
             self.display.display_number('G', self.goal_distance)
         raise Exception("Unknown state " + str(self.state))
 
+    def game_ended(self):
+        if self.HP <= 0:
+            self.state = State.DEAD
+            self.display.display_text("dead")
+        if self.state == State.FINISHED:
+            self.display.display_time()
+        return self.state in [State.DEAD, State.FINISHED]
+
     def loop(self):
         NFC_thread = Thread(target=NFC_reading, args=[])
         NFC_thread.start()
-        while True:
+        while not self.game_ended():
             try:
                 # strength = -network_scanner.get_signal_strength(address)
                 print("cycle")
