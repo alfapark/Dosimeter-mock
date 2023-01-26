@@ -155,6 +155,8 @@ class DosimeterMock:
     def loop(self):
         NFC_thread = Thread(target=NFC_reading, args=[])
         NFC_thread.start()
+        WIFI_thread = Thread(target=WIFI_reading, args=[])
+        WIFI_thread.start()
         while True:
             while not self.game_ended():
                 try:
