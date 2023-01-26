@@ -93,7 +93,8 @@ class DosimeterMock:
             self.display.display_number('R', self.radiation_strength)
         elif self.state == State.GOAL_DISTANCE:
             self.display.display_number('G', self.goal_distance)
-        raise Exception("Unknown state " + str(self.state))
+        else:
+            raise Exception("Wrong state: " + str(self.state))
 
     def game_ended(self):
         if self.HP <= 0:
@@ -112,7 +113,7 @@ class DosimeterMock:
                 print("cycle")
                 self.HPBar.display(self.HP)
                 self.check_NFC()
-                self.display.display_time()
+                self.handle_state()
                 self.HP -= 1
             except Exception as e:
                 traceback.print_exc()
