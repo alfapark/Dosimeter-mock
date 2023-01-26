@@ -167,7 +167,7 @@ class DosimeterMock:
                     traceback.print_exc()
                     print('Exception', str(e))
                 time.sleep(0.1)
-                self.status_led_up()
+            self.status_led_up()
             self.check_NFC()
             time.sleep(0.1)
 
