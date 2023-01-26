@@ -80,10 +80,13 @@ class DosimeterMock:
         self.parse_config()
 
     def parse_config(self):
-        config_dict = load_json_file("config.json")
-        self.goal_address = config_dict["goal_adr"]
-        self.radiation_addresses = config_dict["radiation_adrs"]
-
+        try:
+            config_dict = load_json_file("config.json")
+            self.goal_address = config_dict["goal_adr"]
+            self.radiation_addresses = config_dict["radiation_adrs"]
+        except:
+            self.goal_address = "invalid"
+            self.radiation_addresses = []
 
     def set_initial_state(self):
         self.state = State.GOAL_DISTANCE
