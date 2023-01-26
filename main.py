@@ -43,13 +43,13 @@ next_state = {
 
 class DosimeterMock:
     def __init__(self):
+        self.set_initial_state()
         #GPIO Basic initialization
         GPIO.setmode(GPIO.BCM)
         GPIO.setwarnings(True)
 
         status_led_pin = 21
         GPIO.setup(status_led_pin,GPIO.OUT)
-        self.HP = 100
 
         leds = [20,26,19,13,6,5]
         self.HPBar = HealthBar(leds, maxval=self.HP)
@@ -59,12 +59,12 @@ class DosimeterMock:
         self.button = Button(4)
         self.button_hold_last_time = False
 
-        self.set_initial_state()
 
     def set_initial_state(self):
         self.state = State.GOAL_DISTANCE
         self.radiation_strength = 0
         self.goal_distance = 100
+        self.HP = 100
 
     def check_NFC(self):
         global NFC_MSG
