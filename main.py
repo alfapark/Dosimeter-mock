@@ -3,6 +3,7 @@ import time
 import network_scanner
 import sys
 from threading import Thread
+from enum import Enum
 
 from healthbar import HealthBar
 from read import Reader
@@ -11,14 +12,29 @@ from button import Button
 
 # address = sys.argv[1]
 
-NFC_MSG = None
-        
+NFC_MSG = None        
+
 def NFC_reading():
     reader = Reader()
     while True:
         id,text = reader.read()
         print(id, text)
         NFC_MSG = text
+
+class State(Enum):
+    RADIATION = 1
+    TIME = 2
+    HEALTH = 3
+    GOAL_DISTANCE = 4
+    FINISHED = 10
+
+next_state = {
+    State.FINISHED: State.FINISHED,
+    State.RADIATION : State.TIME,
+    State.TIME : State.HEALTH,
+    State.HEALTH : State.GOAL_DISTANCE,
+    State.GOAL_DISTANCE : State.RADIATION,
+}
 
 class DosimeterMock:
     def __init__(self):
@@ -36,6 +52,11 @@ class DosimeterMock:
         self.display = Display(clk_pin=3, dio_pin=2)
 
         self.button = Button(4)
+        self.button_hold_last_time = False
+
+        self.state = State.GOAL_DISTANCE
+        self.radiation_strength = 0
+        self.goal_distance = 100
 
     def check_NFC(self):
         msg = NFC_MSG
@@ -45,6 +66,21 @@ class DosimeterMock:
         if msg == "HP":
             self.HP = 100
 
+    def handle_state(self):
+        button_hold = self.button.is_hold()
+        if button_hold and not self.button_hold_last_time:
+            self.state = next_state(self.state)
+        self.button_hold_last_time = button_hold
+
+        if self.state == State.TIME:
+            self.display.display_time()
+        elif self.state == State.HEALTH:
+            self.display.display_number('H', self.HP)
+        elif self.state == State.RADIATION:
+            self.display.display_number('R', self.radiation_strength)
+        elif self.state == State.GOAL_DISTANCE:
+            self.display.display_number('G', self.goal_distance)
+        raise Exception("Unknown state " + str(self.state))
 
     def loop(self):
         NFC_thread = Thread(target=NFC_reading, args=[])

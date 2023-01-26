@@ -12,6 +12,9 @@ class Display:
         minutes, seconds = elapsed//60, elapsed//1 % 60 
         self.tm.numbers(minutes, seconds)
 
+    def display_number(self, letter, number):
+        chars = letter + str(number).zfill(3)
+        self.tm.show(chars)
 
 
 if __name__ == "__main__":
