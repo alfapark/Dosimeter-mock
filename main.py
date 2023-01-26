@@ -72,6 +72,8 @@ class DosimeterMock:
         NFC_MSG = None
         if msg is None:
             return
+        msg = msg.strip()
+        print(msg)
         if msg == "HP":
             self.HP = 100
         elif msg == "GOAL":
@@ -82,7 +84,7 @@ class DosimeterMock:
     def handle_state(self):
         button_hold = self.button.is_hold()
         if button_hold and not self.button_hold_last_time:
-            self.state = next_state(self.state)
+            self.state = next_state[self.state]
         self.button_hold_last_time = button_hold
 
         if self.state == State.TIME:
@@ -114,7 +116,7 @@ class DosimeterMock:
                 self.HPBar.display(self.HP)
                 self.check_NFC()
                 self.handle_state()
-                self.HP -= 1
+                self.HP -= 1 
             except Exception as e:
                 traceback.print_exc()
                 print('Exception', str(e))
