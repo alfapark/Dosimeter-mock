@@ -185,8 +185,6 @@ class DosimeterMock:
     def WIFI_reading(self):
         while True:
             WIFI_signals = network_scanner.parse_interface()
-            if WIFI_signals != self.WIFI_signals:
-                self.status_led_up()
             self.WIFI_signals = WIFI_signals
             time.sleep(1)
 
