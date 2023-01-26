@@ -9,10 +9,11 @@ class Display:
     def display_time(self):
         elapsed = time.time()
         elapsed -= self.start_time
-        minutes, seconds = elapsed//60, elapsed//1 % 60 
+        minutes, seconds = int(elapsed//60), int(elapsed) % 60 
         self.tm.numbers(minutes, seconds)
 
     def display_number(self, letter, number):
+        number = int(number)
         chars = letter + str(number).zfill(3)
         self.tm.show(chars)
 

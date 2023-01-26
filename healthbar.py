@@ -8,6 +8,6 @@ class HealthBar:
             GPIO.setup(pin,GPIO.OUT)
 
     def display(self, value):
-        step = self.maxval/value
+        step = self.maxval/len(self.pins)
         for i in range(len(self.pins)):
             GPIO.output(self.pins[i], value >= i*step)

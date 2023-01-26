@@ -4,6 +4,7 @@ import network_scanner
 import sys
 from threading import Thread
 from enum import Enum
+import traceback
 
 from healthbar import HealthBar
 from read import Reader
@@ -59,6 +60,7 @@ class DosimeterMock:
         self.goal_distance = 100
 
     def check_NFC(self):
+        global NFC_MSG
         msg = NFC_MSG
         NFC_MSG = None
         if msg is None:
@@ -94,6 +96,7 @@ class DosimeterMock:
                 self.display.display_time()
                 self.HP -= 1
             except Exception as e:
+                traceback.print_exc()
                 print('Exception', str(e))
             time.sleep(0.1)
 
