@@ -131,6 +131,7 @@ class DosimeterMock:
                     print('Exception', str(e))
                 time.sleep(0.1)
             self.check_NFC()
+            time.sleep(0.1)
 
 
 if __name__ == "__main__":
