@@ -65,6 +65,11 @@ class DosimeterMock:
         self.radiation_strength = 0
         self.goal_distance = 100
         self.HP = 100
+        self.start = time.time()
+
+    def get_elapsed_seconds(self):
+        elapsed = time.time() - self.start
+        return int(elapsed)
 
     def check_NFC(self):
         global NFC_MSG
@@ -88,7 +93,7 @@ class DosimeterMock:
         self.button_hold_last_time = button_hold
 
         if self.state == State.TIME:
-            self.display.display_time()
+            self.display.display_time(self.get_elapsed_seconds())
         elif self.state == State.HEALTH:
             self.display.display_number('H', self.HP)
         elif self.state == State.RADIATION:
@@ -103,7 +108,7 @@ class DosimeterMock:
             self.state = State.DEAD
             self.display.display_text("dead")
         if self.state == State.FINISHED:
-            self.display.display_time()
+            self.display.display_time(self.get_elapsed_seconds())
         return self.state in [State.DEAD, State.FINISHED]
 
     def loop(self):

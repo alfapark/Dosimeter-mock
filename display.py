@@ -4,11 +4,8 @@ import time
 class Display:
     def __init__(self, clk_pin, dio_pin):
         self.tm = tm1637.TM1637(clk=clk_pin, dio=dio_pin)
-        self.start_time = time.time()
 
-    def display_time(self):
-        elapsed = time.time()
-        elapsed -= self.start_time
+    def display_time(self, elapsed):
         minutes, seconds = int(elapsed//60), int(elapsed) % 60 
         self.tm.numbers(minutes, seconds)
 
