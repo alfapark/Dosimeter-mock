@@ -33,12 +33,12 @@ def parse_signal_strength(entry):
     return int(entry['Signal level'].split(' ')[0])
 
 def parse_signal_strengths(parsed_interface = None):
-    if parse_interface is None:
+    if parsed_interface is None:
         parsed_interface = parse_interface()
     return { c:parse_signal_strength(parsed_interface[c]) for c in parsed_interface}
 
 def get_signal_strength(address, parsed_interface = None):
-    if parse_interface is None:
+    if parsed_interface is None:
         parsed_interface = parse_interface()
     return parse_signal_strength(parsed_interface[address])
 
