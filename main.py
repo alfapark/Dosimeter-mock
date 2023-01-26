@@ -39,7 +39,7 @@ WIFI_signals = dict()
 def WIFI_reading():
     global WIFI_signals
     while True:
-        WIFI_signals = network_scanner.parse_signal_strengths()
+        WIFI_signals = network_scanner.parse_interface()
         time.sleep(1)
 
 class State(Enum):
@@ -142,15 +142,15 @@ class DosimeterMock:
         global WIFI_signals
         signals = WIFI_signals
         self.goal_distance = 999
-        if self.goal_address in signals:
-            self.goal_distance = -signals[self.goal_address]
         self.radiation_strength = 0
-        for address in self.radiation_addresses:
-            if address in signals:
-                self.radiation_strength += signals[self.goal_address] + 100
+        for address in WIFI_signals:
+            if address in self.radiation_addresses or WIFI_signals[address]['ESSID'] == "DM-radiation":
+                self.radiation_strength += network_scanner.parse_signal_strength(WIFI_signals[address]) + 100
+            if self.goal_address in signals or WIFI_signals[address]['ESSID'] == "DM-goal":
+                self.goal_distance = -network_scanner.parse_signal_strength(WIFI_signals[address])
 
     def update_HP(self):
-        self.HP -= self.radiation_strength/100
+        self.HP -= self.radiation_strength/1000
 
     def loop(self):
         NFC_thread = Thread(target=NFC_reading, args=[])
@@ -172,6 +172,7 @@ class DosimeterMock:
                     print('Exception', str(e))
                 time.sleep(0.1)
             self.check_NFC()
+            time.sleep(0.1)
 
 
 if __name__ == "__main__":
