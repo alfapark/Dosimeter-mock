@@ -1,0 +1,94 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{fullpage}
+
+\usepackage{fancyhdr}
+\setlength{\headheight}{16pt}
+\pagestyle{fancy}
+\renewcommand{\headrulewidth}{0.2pt} % no line in header area
+\fancyhead{}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Computational Aspects of Digital Fabrication}
+\rhead{Jan Pokorný}
+\rfoot{\thepage}
+\title{Dosimeter game}
+\begin{document}
+\vspace*{10px}
+{\huge{Dosimeter game: Info sheet}}
+
+\section{Game}
+The goal of the game is to survive and find a NFC tag. 
+The player gathers information about its surrounding through a device.
+The device gives the player a rough distance from the goal item and a strength of the radiation.
+If the player is area with radiation, he loses health points.
+If the health points of the player ever reaches a zero, the game is over.
+
+\subsection{Controls}
+\begin{enumerate}
+\item Use the NFC card to restart the device by putting it next to the NFC reader (slightly darker rectangle, left of the button).
+\item Press the button to change the displayed information. THe display displays these types of information:
+\begin{itemize}
+\item Goal(G): The distance (not in meters - signal strength from the ) from the goal.
+\item Time: Time since the beggining of the game.
+\item Radiation(r): Amount of radiation the player is receiving. The higher the radiation, the faster loses the player health points. 
+\item Health(H): Number of health points remaining, if this counter reaches zero, the game ends.
+The letter in parenthesis is displayed as the first character on the display.
+\end{itemize}
+\item Monitor the health bar, the less LEDs are lit up, the lower the amount of health points the player has.
+\item Find the NFC tag and put it next to the NFC reader. The display now shows how fast you were.
+\item Write your time to the scoreboard.
+\end{enumerate}
+
+\section{How to make}
+\subsection{Components}
+The main components are:
+\begin{itemize}
+    \item RaspberryPi 4 B
+    \item 4 Digit Display V1.2 (HW-069) 
+    \item RFID-RC522
+    \item Powerbank
+\end{itemize}
+Furthemore, standard components for RPi as LEDs, button, cables were used.
+
+\subsection{PIN layout}
+\begin{itemize}
+    \item Digit Display V1.2 (HW-069)
+        \begin{itemize}
+            \item CLK - GPIO 3 (5)
+            \item DIO - GPIO 2 (3)
+            \item VCC - 3.3V (1)
+            \item GND - GND(6)
+        \end{itemize}
+    \item RFID-RC522
+        \begin{itemize}
+            \item SDA - GPIO 8 (24)
+            \item SCK - GPIO 11 (23)
+            \item MOSI - GPIO 10 (19)
+            \item MISO - GPIO 9 (21)
+            \item IRQ - Not used
+            \item GND - GND (20)
+            \item RST - GPIO 25 (22)
+            \item 3.3V - 3.3V (17)
+        \end{itemize}
+    \item Button
+        \begin{itemize}
+            \item Power - 5V (4)
+            \item Detect - GPIO 4 (7)
+        \end{itemize}
+    \item LEDS
+        \begin{itemize}
+            \item L1 - GPIO 5 (29)
+            \item L2 - GPIO 6 (31)
+            \item L3 - GPIO 13 (33)
+            \item L4 - GPIO 19 (35)
+            \item L5 - GPIO 26 (37)
+            \item L6 - GPIO 20 (38)
+            \item Status - GPIO 21 (40)
+            \item GND - GND (39)
+        \end{itemize}
+\end{itemize}
+\subsection{Tutorial}
+
+\subsection{}
+\end{document}
