@@ -3,8 +3,18 @@
 \usepackage{fullpage}
 \usepackage{graphicx}
 \usepackage{hyperref}
-
+\usepackage{wrapfig}
 \usepackage{fancyhdr}
+\usepackage[ 
+left=2.5cm,
+right=2.5cm, 
+top=3cm, 
+bottom=3cm,
+headheight = 3.5\baselineskip,
+headsep = 5mm,
+a4paper
+]{geometry}
+
 \setlength{\headheight}{16pt}
 \pagestyle{fancy}
 \renewcommand{\headrulewidth}{0.2pt} % no line in header area
@@ -16,13 +26,12 @@
 \rfoot{\thepage}
 \title{Dosimeter game}
 \begin{document}
-\vspace*{10px}
-{\huge{Dosimeter game: Info sheet}}
 
+{\huge{Dosimeter game: Info sheet}}
 
 \begin{center}
     \centering
-    \includegraphics[width=0.7\textwidth]{imgs/Box2.jpg}
+    \includegraphics[width=0.5\textwidth]{imgs/Box2.jpg}
 \end{center}
 
 \section{Game}
@@ -48,13 +57,15 @@ The letter in parenthesis is displayed as the first character on the display.
 \item Write your time to the scoreboard.
 \end{enumerate}
 
+\emph{Be carefully with the device, too quick movements with it may damage the components inside.}
+
 \section{How to make}
 
-\begin{figure}
+\begin{wrapfigure}{r}{0.5\textwidth}
     \centering
-    \includegraphics[width=0.5\textwidth]{imgs/Sketch.png}
-    \caption{FIrst sketch of the device.}
-\end{figure}
+    \includegraphics[width=0.4\textwidth]{imgs/Sketch.png}
+    \caption{First sketch of the device.}
+\end{wrapfigure}
 
 \subsection{Components}
 The main components are:
@@ -133,42 +144,44 @@ To name the tags, the file \texttt{write.json} may be used.
     The component \emph{RFID-RC522} has to be soldered. 
 \begin{figure}[ht]
     \centering
-    \includegraphics[width=0.5\textwidth]{imgs/Soldering1.jpg}
-    \caption{Soldering of the component \emph{RFID-RC522}.}
+    \begin{tabular}{cc}
+        \label{soldering}
+        \includegraphics[width=0.53\textwidth]{imgs/Soldering1.jpg}
+        &
+        \includegraphics[width=0.3\textwidth]{imgs/Soldering2.jpg}
+    \end{tabular}
+    \caption{Soldering of the component \emph{RFID-RC522}on the left and soldering of the LEDS and the button on the right.}
 \end{figure}
 
     Every LED is connected with a resistor to adjust the amount of current it goes through. 
     All LEDS are connected to a shared ground (yellow) and each of them has its own controlling pin.
     They are connected to the upper box part by a glue gun.
     The button is permanently attached with by a glue gun as well.
-
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.5\textwidth]{imgs/Soldering2.jpg}
-    \caption{Soldering of the LEDS and the button.}
-\end{figure}
+    The exact wiring is shown in figure \ref{soldering} and then in figure \ref{wiring}.
 
     Every component is connected to the RaspberryPi as described in section \ref{pins}. 
     The display is attached to the upper part of the box with tight fit.
     The NFC reader is attached by a clear sticky tape.
 
 \begin{figure}[ht]
+    \label{wiring}
     \centering
-    \includegraphics[width=0.5\textwidth]{imgs/Inside.jpg}
-    \caption{The device from the inside.}
+    \begin{tabular}{cc}
+        \includegraphics[width=0.5\textwidth]{imgs/Inside.jpg}
+        &
+        \includegraphics[width=0.5\textwidth]{imgs/Box1.jpg}
+    \end{tabular}
+    \caption{The device from the inside on the left and completed running device on the right.}
 \end{figure}
 
     To turn the device on run \texttt{main.py}.
     Required packages are listed in \texttt{requirements.txt}
 
-\begin{figure}[ht]
-    \centering
-    \includegraphics[width=0.5\textwidth]{imgs/Box1.jpg}
-    \caption{Resulting assembled device.}
-\end{figure}
 
     The code, models and other assets are on GitHub: \url{https://github.com/alfapark/Dosimeter-mock}.
 
 
-\subsection{}
+\subsection{Declaration}
+    The project was done entirely by its single author Jan Pokorny. 
+    The involvement of other people was only through discussion of technical details amd borrowing of their equipment which I am thankful for.
 \end{document}
