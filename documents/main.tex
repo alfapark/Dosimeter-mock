@@ -1,6 +1,8 @@
 \documentclass{article}
 \usepackage[utf8]{inputenc}
 \usepackage{fullpage}
+\usepackage{graphicx}
+\usepackage{hyperref}
 
 \usepackage{fancyhdr}
 \setlength{\headheight}{16pt}
@@ -16,6 +18,12 @@
 \begin{document}
 \vspace*{10px}
 {\huge{Dosimeter game: Info sheet}}
+
+
+\begin{center}
+    \centering
+    \includegraphics[width=0.7\textwidth]{imgs/Box2.jpg}
+\end{center}
 
 \section{Game}
 The goal of the game is to survive and find a NFC tag. 
@@ -41,6 +49,13 @@ The letter in parenthesis is displayed as the first character on the display.
 \end{enumerate}
 
 \section{How to make}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.5\textwidth]{imgs/Sketch.png}
+    \caption{FIrst sketch of the device.}
+\end{figure}
+
 \subsection{Components}
 The main components are:
 \begin{itemize}
@@ -51,7 +66,7 @@ The main components are:
 \end{itemize}
 Furthemore, standard components for RPi as LEDs, button, cables were used.
 
-\subsection{PIN layout}
+\subsection{PIN layout} \label{pins}
 \begin{itemize}
     \item Digit Display V1.2 (HW-069)
         \begin{itemize}
@@ -88,7 +103,72 @@ Furthemore, standard components for RPi as LEDs, button, cables were used.
             \item GND - GND (39)
         \end{itemize}
 \end{itemize}
+
+\subsection{Extra components}
+To be able to play the game you additionally need NFC tags and devices capable to emit Wi-fi signal.
+
+The device is able to detect the Wi-fi networks automatically if you name them \texttt{DM-radiation} and \texttt{DM-goal} to be listed as the radiation and goal respectively. 
+It is also possible to specify their ESSID in the \texttt{config.json}.
+The NFC tags have to be named correctly:
+\begin{itemize}
+    \item \texttt{HP} -- sets the player health points to 100.
+    \item \texttt{RESET} -- restarts the game.
+    \item \texttt{GOAL} -- wins the game.
+\end{itemize}
+To name the tags, the file \texttt{write.json} may be used.
+
 \subsection{Tutorial}
+    Depending on the exact components used, the device may differ.
+    The provided STL \texttt{models/box.stl} expects standard Arduino/RaspberryPi LEDs nad button and 43x91 mm powerbank.
+    To adjust the 3D model, change parameters in \texttt{models/box.scad} using \emph{OpenSCAD}.
+    Both models are contained in a single file to be able to see how components line up.
+    For printing the model has to be split up into two pieces and rotated correspondingly. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{imgs/Printing.jpg}
+    \caption{3D printing of provided models.}
+\end{figure}
+
+    The component \emph{RFID-RC522} has to be soldered. 
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{imgs/Soldering1.jpg}
+    \caption{Soldering of the component \emph{RFID-RC522}.}
+\end{figure}
+
+    Every LED is connected with a resistor to adjust the amount of current it goes through. 
+    All LEDS are connected to a shared ground (yellow) and each of them has its own controlling pin.
+    They are connected to the upper box part by a glue gun.
+    The button is permanently attached with by a glue gun as well.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{imgs/Soldering2.jpg}
+    \caption{Soldering of the LEDS and the button.}
+\end{figure}
+
+    Every component is connected to the RaspberryPi as described in section \ref{pins}. 
+    The display is attached to the upper part of the box with tight fit.
+    The NFC reader is attached by a clear sticky tape.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{imgs/Inside.jpg}
+    \caption{The device from the inside.}
+\end{figure}
+
+    To turn the device on run \texttt{main.py}.
+    Required packages are listed in \texttt{requirements.txt}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.5\textwidth]{imgs/Box1.jpg}
+    \caption{Resulting assembled device.}
+\end{figure}
+
+    The code, models and other assets are on GitHub: \url{https://github.com/alfapark/Dosimeter-mock}.
+
 
 \subsection{}
 \end{document}
