@@ -72,6 +72,8 @@ module box_lower(
     screw_hole_size,
     walls, // array of [x,y, size_x, size_y, size_z] - x,y is the offset to the left upper corner,
     columns, // array of [x,y, diameter, height]
+    antenna_width,
+    antenna_height
 ){
     offset_x = thickness;
     offset_y = 2*screw_offset;
@@ -100,10 +102,17 @@ module box_lower(
         translate([object[0]+offset_x, object[1]+offset_y, offset_z])
             cylinder(d = object[2], h = object[3]);
     }
-    
+    // anntenna
+    translate([0, new_y,0]){
+        difference(){
+            cube([antenna_width+thickness, antenna_width+thickness, antenna_height+thickness]);
+            translate([(antenna_width+thickness)/2,(antenna_width+thickness)/2, thickness])
+            cylinder(d=antenna_width, h=antenna_height);
+        }
+    }
 }
 translate([0,0, 200])
-!box_upper(
+box_upper(
 size_x=125,
 size_y=150,
 thickness=2.5,
@@ -159,5 +168,7 @@ columns=[
     [rpi_screw1_x+58,rpi_screw1_y,2.5,5],
     [rpi_screw1_x,rpi_screw1_y-49,2.5,5],
     [rpi_screw1_x+58,rpi_screw1_y-49,2.5,5]
-]
+],
+antenna_width=10,
+antenna_height=10
 );
