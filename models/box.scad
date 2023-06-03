@@ -1,3 +1,6 @@
+use <radiation.scad>
+use <signal.scad>
+
 // shear such that point will translate by [p.x,p.y] as z-axis is traversed by p.z units
 // https://gist.github.com/thehans/c30c259e83da4e89ccbd975a511dab68
 module shearAlongZ(p) {
@@ -49,6 +52,9 @@ pegs, // array of [x,y, size_x, size_y, size_z, shear_x, shear_y]
             translate([object[0]+offset_x, object[1]+offset_y,0])
                 cylinder(h=thickness, d=object[2]);
         }
+        translate([offset_x, offset_y, thickness])
+        mirror([0,0,1])
+        children();
     }
     for(peg = pegs){
         translate([peg[0]+offset_x-peg[5], peg[1]+offset_y-peg[6], -peg[4]])
@@ -94,6 +100,7 @@ module box_lower(
         translate([object[0]+offset_x, object[1]+offset_y, offset_z])
             cylinder(d = object[2], h = object[3]);
     }
+    
 }
 translate([0,0, 200])
 !box_upper(
@@ -115,6 +122,7 @@ circle_holes=[
     [100,90,6],
     [110,90,6],
     [110,105,6],//status
+    [30, 120,6],//status
 ],
 pegs=[
     [7.5,20, 3,3, 5, 5, 0], // NFC
@@ -125,7 +133,14 @@ pegs=[
     [80+31, 120-3, 3, 14+6, 5,0,0], 
     [80, 120+14, 31, 3, 5,0,0], 
 ]
-);
+){
+    linear_extrude(height=0.5)
+        translate([30, 120])
+            radiation(25, 5, 3);
+    linear_extrude(height=0.5)
+        translate([31, 40])
+            signal(4, 3);
+};
 rpi_screw1_x = 10;
 rpi_screw1_y = 145;
 box_lower(
