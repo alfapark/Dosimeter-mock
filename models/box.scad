@@ -20,6 +20,7 @@ screw_hole_size,
 rectangle_holes, // array of [x,y, size_x, size_y] - x,y is the ofset to the left upper corner
 circle_holes, // array of [x,y, diameter] - x,y is the offset from center
 pegs, // array of [x,y, size_x, size_y, size_z, shear_x, shear_y]
+bridges, // array of [x,y,size_x,size_y,size_z]
 ){
     offset_x = thickness;
     offset_y = 2*screw_offset;
@@ -60,6 +61,15 @@ pegs, // array of [x,y, size_x, size_y, size_z, shear_x, shear_y]
         translate([peg[0]+offset_x-peg[5], peg[1]+offset_y-peg[6], -peg[4]])
         shearAlongZ([peg[5],peg[6],peg[4]])
             cube([peg[2], peg[3], peg[4]]);
+    }
+    for(bridge = bridges){
+        translate([bridge[0]+offset_x, bridge[1]+offset_y-thickness, -bridge[4]]){
+                cube([bridge[2], thickness, bridge[4]]);
+            translate([0,0,-thickness])
+                cube([bridge[2], bridge[3]+2*thickness, thickness]);
+            translate([0, bridge[3]+thickness, 0])
+                cube([bridge[2], thickness, bridge[4]]);
+        }
     }
 }
 
@@ -130,17 +140,21 @@ circle_holes=[
     [90,90,6],
     [100,90,6],
     [110,90,6],
-    [110,105,6],//status
-    [30, 120,6],//status
+    [110,105,6], // status
+    [30, 120,6], // radiation
 ],
 pegs=[
     [7.5,20, 3,3, 5, 5, 0], // NFC
     [53,20, 3,3, 5, -5, 0],
     [7.5,55, 3,3, 5, 5, 0],
     [53,55, 3,3, 5, -5, 0],
-    [80, 120-3, 31, 3, 5,0,0], // display support
-    [80+31, 120-3, 3, 14+6, 5,0,0], 
-    [80, 120+14, 31, 3, 5,0,0], 
+    [80, 120-3, 31, 3, 4,0,0], // display support
+    [80+31, 120-3, 3, 14+6, 4,0,0], 
+    [80, 120+14, 31, 3, 4,0,0], 
+],
+bridges=[
+    [80, 43, 4, 6, 3], // button 
+    [108, 43, 4, 6,3], // button 
 ]
 ){
     linear_extrude(height=0.5)
@@ -148,8 +162,7 @@ pegs=[
             radiation(25, 5, 3);
     linear_extrude(height=0.5)
         translate([31, 40])
-            signal(4, 3);
-};
+            signal(4, 3);};
 rpi_screw1_x = 10;
 rpi_screw1_y = 145;
 box_lower(
@@ -161,13 +174,15 @@ screw_offset=5,
 screw_hole_size=3,
 walls=[
     [125-91-2.5, 0, 2.5, 20, 22], // powerbank short
-    [125-90,44,91,2.5,22] // powerbonk long
+    [125-90,44,91,2.5,22], // powerbank long
+    [rpi_screw1_x+85-3.5, 150-60, 2.5, 60, 5], // rpi mini wall
+    [0, 150-60, rpi_screw1_x+85-3.5, 2.5, 5], // rpi mini wall
 ],
 columns=[
-    [rpi_screw1_x,rpi_screw1_y,2.5,5], // RPI screw columns
-    [rpi_screw1_x+58,rpi_screw1_y,2.5,5],
-    [rpi_screw1_x,rpi_screw1_y-49,2.5,5],
-    [rpi_screw1_x+58,rpi_screw1_y-49,2.5,5]
+    [rpi_screw1_x,rpi_screw1_y,2.7,5], // RPI screw columns
+    [rpi_screw1_x+58,rpi_screw1_y,2.7,5],
+    [rpi_screw1_x,rpi_screw1_y-49,2.7,5],
+    [rpi_screw1_x+58,rpi_screw1_y-49,2.7,5]
 ],
 antenna_width=10,
 antenna_height=10
