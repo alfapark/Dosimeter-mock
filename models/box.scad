@@ -16,8 +16,7 @@ screw_offset, // both x and y offset for screw hole from the corner to the cente
 screw_hole_size,
 rectangle_holes, // array of [x,y, size_x, size_y] - x,y is the ofset to the left upper corner
 circle_holes, // array of [x,y, diameter] - x,y is the offset from center
-pegs,
-pegs_height
+pegs, // array of [x,y, size_x, size_y, size_z, shear_x, shear_y]
 ){
     offset_x = thickness;
     offset_y = 2*screw_offset;
@@ -52,9 +51,9 @@ pegs_height
         }
     }
     for(peg = pegs){
-        translate([peg[0]+offset_x-peg[3], peg[1]+offset_y-peg[4], -peg[2]])
-        shearAlongZ([peg[3],peg[4],peg[2]])
-            cube([thickness, thickness, peg[2]]);
+        translate([peg[0]+offset_x-peg[5], peg[1]+offset_y-peg[6], -peg[4]])
+        shearAlongZ([peg[5],peg[6],peg[4]])
+            cube([peg[2], peg[3], peg[4]]);
     }
 }
 
@@ -118,10 +117,13 @@ circle_holes=[
     [110,105,6],//status
 ],
 pegs=[
-    [7.5,20, 10, 10, 0],
-    [53,20, 10, -10, 0],
-    [7.5,55, 10, 10, 0],
-    [53,55, 10, -10, 0],
+    [7.5,20, 3,3, 5, 5, 0], // NFC
+    [53,20, 3,3, 5, -5, 0],
+    [7.5,55, 3,3, 5, 5, 0],
+    [53,55, 3,3, 5, -5, 0],
+    [80, 120-3, 31, 3, 5,0,0], // display support
+    [80+31, 120-3, 3, 14+6, 5,0,0], 
+    [80, 120+14, 31, 3, 5,0,0], 
 ]
 );
 rpi_screw1_x = 10;
