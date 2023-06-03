@@ -1,3 +1,13 @@
+// shear such that point will translate by [p.x,p.y] as z-axis is traversed by p.z units
+// https://gist.github.com/thehans/c30c259e83da4e89ccbd975a511dab68
+module shearAlongZ(p) {
+  multmatrix([
+    [1,0,p.x/p.z,0],
+    [0,1,p.y/p.z,0],
+    [0,0,1,0]
+  ]) children();
+}
+
 module box_upper(
 size_x, // x size of the lid
 size_y, // y size of the lid
@@ -6,7 +16,8 @@ screw_offset, // both x and y offset for screw hole from the corner to the cente
 screw_hole_size,
 rectangle_holes, // array of [x,y, size_x, size_y] - x,y is the ofset to the left upper corner
 circle_holes, // array of [x,y, diameter] - x,y is the offset from center
-
+pegs,
+pegs_height
 ){
     offset_x = thickness;
     offset_y = 2*screw_offset;
@@ -39,6 +50,11 @@ circle_holes, // array of [x,y, diameter] - x,y is the offset from center
             translate([object[0]+offset_x, object[1]+offset_y,0])
                 cylinder(h=thickness, d=object[2]);
         }
+    }
+    for(peg = pegs){
+        translate([peg[0]+offset_x-peg[3], peg[1]+offset_y-peg[4], -peg[2]])
+        shearAlongZ([peg[3],peg[4],peg[2]])
+            cube([thickness, thickness, peg[2]]);
     }
 }
 
@@ -81,7 +97,7 @@ module box_lower(
     }
 }
 translate([0,0, 200])
-box_upper(
+!box_upper(
 size_x=125,
 size_y=150,
 thickness=2.5,
@@ -100,6 +116,12 @@ circle_holes=[
     [100,90,6],
     [110,90,6],
     [110,105,6],//status
+],
+pegs=[
+    [7.5,20, 10, 10, 0],
+    [53,20, 10, -10, 0],
+    [7.5,55, 10, 10, 0],
+    [53,55, 10, -10, 0],
 ]
 );
 rpi_screw1_x = 10;
