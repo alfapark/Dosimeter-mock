@@ -53,9 +53,12 @@ bridges, // array of [x,y,size_x,size_y,size_z]
             translate([object[0]+offset_x, object[1]+offset_y,0])
                 cylinder(h=thickness, d=object[2]);
         }
+        
+        /* Not printable for now
         translate([offset_x, offset_y, thickness])
-        mirror([0,0,1])
-        children();
+            mirror([0,0,1])
+                children();
+        */
     }
     for(peg = pegs){
         translate([peg[0]+offset_x-peg[5], peg[1]+offset_y-peg[6], -peg[4]])
@@ -121,10 +124,12 @@ module box_lower(
         }
     }
 }
+size_x = 125;
+size_y = 150;
 translate([0,0, 200])
 box_upper(
-size_x=125,
-size_y=150,
+size_x=size_x,
+size_y=size_y,
 thickness=2.5,
 screw_offset=5,
 screw_hole_size=5,
@@ -163,20 +168,26 @@ bridges=[
     linear_extrude(height=0.5)
         translate([31, 40])
             signal(4, 3);};
+// calculating mounting for rpi
 rpi_screw1_x = 10;
-rpi_screw1_y = 145;
+rpi_screw1_y = 146;
+rpi_length = 85;
+rpi_width = 56;
+rpi_screw_to_side = 4;
+rpi_wall_x = rpi_screw1_x-rpi_screw_to_side+rpi_length;
+rpi_wall_y = rpi_screw1_y+rpi_screw_to_side-rpi_width;
 box_lower(
-size_x=125,
-size_y=150,
+size_x=size_x,
+size_y=size_y,
 size_z =40,
 thickness=2.5,
 screw_offset=5,
 screw_hole_size=3,
 walls=[
-    [125-91-2.5, 0, 2.5, 20, 22], // powerbank short
-    [125-90,44,91,2.5,22], // powerbank long
-    [rpi_screw1_x+85-3.5, 150-60, 2.5, 60, 5], // rpi mini wall
-    [0, 150-60, rpi_screw1_x+85-3.5, 2.5, 5], // rpi mini wall
+    [size_x-91-2.5, 0, 2.5, 20, 22], // powerbank short
+    [size_x-90,44,91,2.5,22], // powerbank long
+    [rpi_wall_x, rpi_wall_y, 2.5, 150-(rpi_wall_y), 3], // rpi vertical mini wall
+    [0, rpi_wall_y-2.5, rpi_wall_x+2.5, 2.5, 3], // rpi horizontal mini wall
 ],
 columns=[
     [rpi_screw1_x,rpi_screw1_y,2.7,5], // RPI screw columns
