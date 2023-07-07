@@ -33,4 +33,5 @@
   - L5 - GPIO 26 (37)
   - L6 - GPIO 20 (38)
   - Status - GPIO 21 (40)
+  - Radiation - GPIO 16 (36)
   - GND - GND (39)
