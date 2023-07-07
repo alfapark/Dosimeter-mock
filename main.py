@@ -51,6 +51,8 @@ class DosimeterMock:
 
         self.status_led_pin = 21
         GPIO.setup(self.status_led_pin,GPIO.OUT)
+        self.radiation_led_pin = 16
+        GPIO.setup(self.radiation_led_pin,GPIO.OUT)
 
         leds = [20,26,19,13,6,5]
         self.HPBar = HealthBar(leds, maxval=self.HP)
@@ -67,6 +69,7 @@ class DosimeterMock:
 
         self.status_time = time.time()
         self.shield_time = time.time()
+        self.last_radiation_up = time.time()
 
     def parse_config(self):
         try:
@@ -91,6 +94,14 @@ class DosimeterMock:
     def update_status_led(self):
         if self.status_time < time.time():
             GPIO.output(self.status_led_pin, False)
+
+    def update_radiation_led(self):
+        if self.last_radiation_up > time.time() + 0.2:
+            GPIO.output(self.radiation_led_pin, False)
+        diff = (time.time() - self.last_radiation_up)
+        if diff/self.radiation_strength < 0.05:
+            GPIO.output(self.radiation_led_pin, True)
+            self.last_radiation_up = time.time()
 
     def get_elapsed_seconds(self):
         elapsed = time.time() - self.start
@@ -165,6 +176,7 @@ class DosimeterMock:
                 try:
                     print("cycle")
                     self.update_status_led()
+                    self.update_radiation_led()
                     self.handle_network()
                     self.HPBar.display(self.HP)
                     self.check_NFC()
