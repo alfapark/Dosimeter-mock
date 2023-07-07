@@ -29,6 +29,8 @@ class State(Enum):
     HEALTH = 3
     GOAL_DISTANCE = 4
     SHIELD = 5
+    WAIT = 6
+    OBJECTIVE = 9
     FINISHED = 10
     DEAD = 11
 
@@ -39,7 +41,9 @@ next_state = {
     State.TIME : State.HEALTH,
     State.HEALTH : State.GOAL_DISTANCE,
     State.GOAL_DISTANCE : State.SHIELD,
-    State.RADIATION : State.RADIATION,
+    State.SHIELD : State.WAIT,
+    State.WAIT : State.OBJECTIVE,
+    State.OBJECTIVE : State.RADIATION,
 }
 
 class DosimeterMock:
@@ -67,10 +71,6 @@ class DosimeterMock:
         self.NFC_MSG = None        
         self.WIFI_signals = dict()
 
-        self.status_time = time.time()
-        self.shield_time = time.time()
-        self.last_radiation_up = time.time()
-
     def parse_config(self):
         try:
             config_dict = load_json_file("config.json")
@@ -86,6 +86,12 @@ class DosimeterMock:
         self.goal_distance = 100
         self.HP = 100
         self.start = time.time()
+        self.status_time = time.time()
+        self.shield_time = time.time()
+        self.last_radiation_up = time.time()
+        self.wait_time = None
+        self.to_do_state = 1
+
 
     def status_led_up(self):
         GPIO.output(self.status_led_pin, True)
@@ -116,6 +122,8 @@ class DosimeterMock:
         print(msg)
         if msg == "HP":
             self.HP = 100
+        if msg == "NEXT":
+            self.to_do_state += 1
         elif msg == "GOAL":
             self.state = State.FINISHED
         elif msg == "RESET":
@@ -139,6 +147,10 @@ class DosimeterMock:
             self.display.display_number('G', self.goal_distance)
         elif self.state == State.SHIELD:
             self.display.display_number('S', max(self.shield_time-time.time(), 0))
+        elif self.state == State.WAIT:
+            self.display.display_number('W', self.wait_time)
+        elif self.state == State.OBJECTIVE:
+            self.display.display_number('O', self.to_do_state)
         elif self.state not in [State.FINISHED, State.DEAD]:
             raise Exception("Wrong state: " + str(self.state))
 
@@ -157,10 +169,28 @@ class DosimeterMock:
         self.goal_distance = 999
         self.radiation_strength = 0
         for address in signals:
-            if address in self.radiation_addresses or signals[address]['ESSID'] == '"DM-radiation"':
+            essid = signals[address]['ESSID'] 
+            essid = essid[1:-1]
+            if address in self.radiation_addresses or essid == 'DM-radiation':
                 self.radiation_strength += network_scanner.parse_signal_strength(signals[address]) + 100
-            if self.goal_address == address or signals[address]['ESSID'] == '"DM-goal"':
+            if essid[0:3] != 'DM-':
+                # TODO addresses from config
+                continue 
+            order = essid[3]
+            dash_index = order.index('-')
+            quest = order[dash_index+1]
+            order = order[0:dash_index]
+            order = int(order)
+
+            if order == self.to_do_state:
                 self.goal_distance = -network_scanner.parse_signal_strength(signals[address])
+                if quest == "defend":
+                    if self.wait_time is None:
+                        self.wait_time = 100
+                    self.wait_time -= max(100 - self.goal_distance, 0)/100
+                    if self.wait_time <= 0:
+                        self.wait_time = None
+                        self.to_do_state += 1
 
     def update_HP(self):
         if self.shield_time < time.time():
