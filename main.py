@@ -69,6 +69,7 @@ class DosimeterMock:
         self.parse_config()
 
         self.NFC_MSG = None        
+        self.NFC_ID = None        
         self.WIFI_signals = dict()
 
     def parse_config(self):
@@ -91,6 +92,7 @@ class DosimeterMock:
         self.last_radiation_up = time.time()
         self.wait_time = None
         self.to_do_state = 1
+        self.seen_NFC = set()
 
 
     def status_led_up(self):
@@ -105,7 +107,7 @@ class DosimeterMock:
         if self.last_radiation_up > time.time() + 0.2:
             GPIO.output(self.radiation_led_pin, False)
         diff = (time.time() - self.last_radiation_up)
-        if diff/self.radiation_strength < 0.05:
+        if self.radiation_strength > 0 and diff/self.radiation_strength < 0.05:
             GPIO.output(self.radiation_led_pin, True)
             self.last_radiation_up = time.time()
 
@@ -115,13 +117,22 @@ class DosimeterMock:
 
     def check_NFC(self):
         msg = self.NFC_MSG
+        id = self.NFC_ID
         self.NFC_MSG = None
+        self.NFC_ID = None
         if msg is None:
             return
         msg = msg.strip()
         print(msg)
-        if msg == "HP":
+        if msg[0].isnumeric():
+            level = int(msg)
+            if self.to_do_state == level:
+                self.to_do_state +=1
+        if id in self.seen_NFC:
+            return
+        if msg == "HP" :
             self.HP = 100
+            self.seen_NFC.add(id)
         if msg == "NEXT":
             self.to_do_state += 1
         elif msg == "GOAL":
@@ -130,6 +141,7 @@ class DosimeterMock:
             self.set_initial_state()
         elif msg == "SHIELD":
             self.shield_time = time.time() + 30
+            self.seen_NFC.add(id)
 
     def handle_state(self):
         button_hold = self.button.is_hold()
@@ -173,6 +185,7 @@ class DosimeterMock:
             essid = essid[1:-1]
             if address in self.radiation_addresses or essid == 'DM-radiation':
                 self.radiation_strength += network_scanner.parse_signal_strength(signals[address]) + 100
+                continue
             if essid[0:3] != 'DM-':
                 # TODO addresses from config
                 continue 
@@ -229,6 +242,7 @@ class DosimeterMock:
             self.status_led_up()
             print(id, text)
             self.NFC_MSG = text
+            self.NFC_ID = id
             time.sleep(1)
 
 

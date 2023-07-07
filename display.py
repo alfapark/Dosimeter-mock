@@ -10,6 +10,8 @@ class Display:
         self.tm.numbers(minutes, seconds)
 
     def display_number(self, letter, number):
+        if number is None:
+            self.tm.show(letter + "---")
         number = int(number)
         chars = letter + str(number).zfill(3)
         self.tm.show(chars)
