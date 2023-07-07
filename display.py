@@ -12,6 +12,7 @@ class Display:
     def display_number(self, letter, number):
         if number is None:
             self.tm.show(letter + "---")
+            return
         number = int(number)
         chars = letter + str(number).zfill(3)
         self.tm.show(chars)

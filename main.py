@@ -135,7 +135,7 @@ class DosimeterMock:
             self.seen_NFC.add(id)
         if msg == "NEXT":
             self.to_do_state += 1
-        elif msg == "GOAL":
+        elif msg[4] == "GOAL" and int(msg[5:]) == self.to_do_state:
             self.state = State.FINISHED
         elif msg == "RESET":
             self.set_initial_state()
@@ -189,21 +189,24 @@ class DosimeterMock:
             if essid[0:3] != 'DM-':
                 # TODO addresses from config
                 continue 
-            order = essid[3]
-            dash_index = order.index('-')
-            quest = order[dash_index+1]
-            order = order[0:dash_index]
+            order = essid[3:]
+            if '-' in order:
+                dash_index = order.index('-')
+                quest = order[dash_index+1:]
+                order = order[0:dash_index]
             order = int(order)
+            print(order, quest)
 
             if order == self.to_do_state:
                 self.goal_distance = -network_scanner.parse_signal_strength(signals[address])
                 if quest == "defend":
                     if self.wait_time is None:
                         self.wait_time = 100
-                    self.wait_time -= max(100 - self.goal_distance, 0)/100
+                    self.wait_time -= max(100 - self.goal_distance, 0)/200
                     if self.wait_time <= 0:
                         self.wait_time = None
                         self.to_do_state += 1
+                        self.status_led_up()
 
     def update_HP(self):
         if self.shield_time < time.time():
@@ -244,7 +247,6 @@ class DosimeterMock:
             self.NFC_MSG = text
             self.NFC_ID = id
             time.sleep(1)
-
 
     def WIFI_reading(self):
         while True:
