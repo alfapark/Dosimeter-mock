@@ -28,6 +28,7 @@ class State(Enum):
     TIME = 2
     HEALTH = 3
     GOAL_DISTANCE = 4
+    SHIELD = 5
     FINISHED = 10
     DEAD = 11
 
@@ -37,7 +38,8 @@ next_state = {
     State.RADIATION : State.TIME,
     State.TIME : State.HEALTH,
     State.HEALTH : State.GOAL_DISTANCE,
-    State.GOAL_DISTANCE : State.RADIATION,
+    State.GOAL_DISTANCE : State.SHIELD,
+    State.RADIATION : State.RADIATION,
 }
 
 class DosimeterMock:
@@ -64,6 +66,7 @@ class DosimeterMock:
         self.WIFI_signals = dict()
 
         self.status_time = time.time()
+        self.shield_time = time.time()
 
     def parse_config(self):
         try:
@@ -106,6 +109,8 @@ class DosimeterMock:
             self.state = State.FINISHED
         elif msg == "RESET":
             self.set_initial_state()
+        elif msg == "SHIELD":
+            self.shield_time = time.time() + 30
 
     def handle_state(self):
         button_hold = self.button.is_hold()
@@ -121,6 +126,8 @@ class DosimeterMock:
             self.display.display_number('R', self.radiation_strength)
         elif self.state == State.GOAL_DISTANCE:
             self.display.display_number('G', self.goal_distance)
+        elif self.state == State.SHIELD:
+            self.display.display_number('S', max(self.shield_time-time.time(), 0))
         elif self.state not in [State.FINISHED, State.DEAD]:
             raise Exception("Wrong state: " + str(self.state))
 
@@ -145,7 +152,8 @@ class DosimeterMock:
                 self.goal_distance = -network_scanner.parse_signal_strength(signals[address])
 
     def update_HP(self):
-        self.HP -= self.radiation_strength/1000
+        if self.shield_time < time.time():
+            self.HP -= self.radiation_strength/1000
 
     def loop(self):
         NFC_thread = Thread(target=self.NFC_reading, args=[])
