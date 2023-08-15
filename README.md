@@ -1,6 +1,7 @@
 # Dosimeter mock
 
 A game device for outside game. Explore your surroundings, find goals, hide from radiation with a dosimeter device.
+The device gathers Wi-fi signals from the surrounding to approximate distance from the objective and radiation strength. 
 
 ## Documentation
 
