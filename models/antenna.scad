@@ -8,4 +8,4 @@ module antenna(big_radius, small_radius, mounting_height, cone_height, upper_hei
         sphere(r=small_radius);
 }
 
-antenna(10, 5, 10, 80, 20);
+antenna(9.9, 5, 10, 80, 20);

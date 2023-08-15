@@ -1,5 +1,10 @@
 # Dosimeter mock
 
+A game device for outside game. Explore your surroundings, find goals, hide from radiation with a dosimeter device.
+
+## Documentation
+
+Documentation is provided in `documents/main.tex`, compile it with your LaTeX compiler.
 
 ## Components
 - RaspberryPi 4 B

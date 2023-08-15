@@ -44,22 +44,25 @@ If the health points of the player ever reaches a zero, the game is over.
 \subsection{Controls}
 \begin{enumerate}
 \item Use the NFC card to restart the device by putting it next to the NFC reader (slightly darker rectangle, left of the button).
-\item Press the button to change the displayed information. THe display displays these types of information:
+\item Press the button to change the displayed information. The display displays these types of information:
 \begin{itemize}
 \item Goal(G): The distance (not in meters - signal strength from the ) from the goal.
-\item Time: Time since the beggining of the game.
+\item Time: Time since the beginning of the game.
 \item Radiation(r): Amount of radiation the player is receiving. The higher the radiation, the faster loses the player health points. 
 \item Health(H): Number of health points remaining, if this counter reaches zero, the game ends.
-The letter in parenthesis is displayed as the first character on the display.
+\item Shield(S): Shield time remaining.
+\item Wait(W): How much waiting is done in percent.
+\item Objective(O): Number of the current objective.
+The letter in parentheses is displayed as the first character on the display.
 \end{itemize}
-\item Monitor the health bar, the less LEDs are lit up, the lower the amount of health points the player has.
+\item Monitor the health bar, the fewer LEDs are lit up, the lower the amount of health points the player has.
 \item Find the NFC tag and put it next to the NFC reader. The display now shows how fast you were.
 \end{enumerate}
 
 \emph{Be carefully with the device, too quick movements with it may damage the components inside.}
 
 \section{How to make}
-    The creation process includes 3D modeling and printing of the custom box of the device as well as programing of a microprocessor as the tool of digital fabrication.
+    The creation process includes 3D modeling and printing of the custom box of the device as well as programming of a microprocessor as the tool of digital fabrication.
     Other employed techniques are soldering and hot gun gluing.
 
 \begin{wrapfigure}{r}{0.5\textwidth}
@@ -111,6 +114,7 @@ Furthemore, standard components for RPi as LEDs, button, cables were used.
             \item L4 - GPIO 19 (35)
             \item L5 - GPIO 26 (37)
             \item L6 - GPIO 20 (38)
+            \item Radiation LED - GPIO 16 (36)
             \item Status - GPIO 21 (40)
             \item GND - GND (39)
         \end{itemize}
@@ -119,13 +123,19 @@ Furthemore, standard components for RPi as LEDs, button, cables were used.
 \subsection{Extra components}
 To be able to play the game you additionally need NFC tags and devices capable to emit Wi-fi signal.
 
-The device is able to detect the Wi-fi networks automatically if you name them \texttt{DM-radiation} and \texttt{DM-goal} to be listed as the radiation and goal respectively. 
-It is also possible to specify their ESSID in the \texttt{config.json}.
+The device is able to detect the Wi-fi networks automatically if you name them following this naming scheme.
+Networks named \texttt{DM-radiation} will display as radiation and harm the player if he gets too close.
+Other network names have pattern \texttt{DM-N-Name}, where \texttt{N} is the number of the objective in which the network plays its role and \texttt{Name} further specifies the objective.
+The name \texttt{defend} is satisfied when the device is enough time in the proximity of the network. 
+Other objectives are either satisfied with the \texttt{NEXT} or \texttt{GOAL} NFC tag.
+It is also possible to specify their ESSID in the \texttt{config.json} to use existing networks.
 The NFC tags have to be named correctly:
 \begin{itemize}
-    \item \texttt{HP} -- sets the player health points to 100.
-    \item \texttt{RESET} -- restarts the game.
     \item \texttt{GOAL} -- wins the game.
+    \item \texttt{HP} -- sets the player health points to 100.
+    \item \texttt{NEXT} -- changes the objective to the next objective.
+    \item \texttt{RESET} -- restarts the game.
+    \item \texttt{SHIELD} --  prevents radiation for 30 seconds.
 \end{itemize}
 To name the tags, the file \texttt{write.json} may be used.
 
@@ -151,16 +161,16 @@ To name the tags, the file \texttt{write.json} may be used.
         &
         \includegraphics[width=0.3\textwidth]{imgs/Soldering2.jpg}
     \end{tabular}
-    \caption{Soldering of the component \emph{RFID-RC522}on the left and soldering of the LEDS and the button on the right.}
+    \caption{Soldering of the component \emph{RFID-RC522}on the left and soldering of the LEDs and the button on the right.}
 \end{figure}
 
     Every LED is connected with a resistor to adjust the amount of current it goes through. 
-    All LEDS are connected to a shared ground (yellow) and each of them has its own controlling pin.
+    All LEDs are connected to a shared ground (yellow) and each of them has its own controlling pin.
     They are connected to the upper box part by a glue gun.
     The button is permanently attached with by a glue gun as well.
     The exact wiring is shown in figure \ref{soldering} and then in figure \ref{wiring}.
 
-    Every component is connected to the RaspberryPi as described in section \ref{pins}. 
+    Every component is connected to the Raspberry Pi as described in section \ref{pins}. 
     The display is attached to the upper part of the box with tight fit.
     The NFC reader is attached by a clear sticky tape.
 
@@ -182,7 +192,16 @@ To name the tags, the file \texttt{write.json} may be used.
     The code, models and other assets are on GitHub: \url{https://github.com/alfapark/Dosimeter-mock}.
 
 
+\subsection{Known issues}
+\begin{itemize}
+    \item The device may overheat. Raspberry Pi generates a lot of heat and the provided box has no air ventilation.
+    \item Config addresses are not handled properly at the moment.
+    \item The RFID reader works only with new empty RFID chips, writing to them with any other app different from the provided python script \texttt{write.py} might render them unreadable by the device.
+    \item The display is rotated by 180 degrees due to the wiring. 
+    \item Refresh rate of the networks is too slow.
+\end{itemize}
+
 \subsection{Declaration}
-    The project was done entirely by its single author Jan Pokorny. 
-    The involvement of other people was only through discussion of technical details amd borrowing of their equipment which I am thankful for.
+    The project was done entirely by its single author Jan Pokorny as a project for subject Computational Aspects of Digital Fabrication at TU Wien. 
+    The involvement of other people was only through discussion of technical details and borrowing of their equipment which I am thankful for.
 \end{document}

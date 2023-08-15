@@ -54,11 +54,10 @@ bridges, // array of [x,y,size_x,size_y,size_z]
                 cylinder(h=thickness, d=object[2]);
         }
         
-        /* Not printable for now
+        /* Not printable for now */
         translate([offset_x, offset_y, thickness])
             mirror([0,0,1])
                 children();
-        */
     }
     for(peg = pegs){
         translate([peg[0]+offset_x-peg[5], peg[1]+offset_y-peg[6], -peg[4]])
